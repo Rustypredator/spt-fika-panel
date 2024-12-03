@@ -2,6 +2,8 @@
 
 namespace App\Helpers;
 
+use Illuminate\Support\Facades\Log;
+
 class SptApiHelper {
     private static function getData($path, array $body = [], $session_id = null) {
         $host = config('spt.host');
@@ -50,11 +52,16 @@ class SptApiHelper {
         if ($decompressed_data === false) {
             throw new Exception('Failed to decompress data');
         } else {
+            Log::debug('SPT API Response for path: ' . $path . ' - ' . $decompressed_data);
             return json_decode($decompressed_data, true);
         }
     }
 
     public static function getRaids() {
         return self::getData('fika/location/raids');
+    }
+
+    public static function dynamic($path) {
+        return self::getData($path);
     }
 }
