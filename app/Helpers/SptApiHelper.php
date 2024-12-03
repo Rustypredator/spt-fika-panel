@@ -61,7 +61,50 @@ class SptApiHelper {
         return self::getData('fika/location/raids');
     }
 
+    public static function ping() {
+        return self::getData('launcher/ping');
+    }
+
+    public static function version() {
+        return self::getData('launcher/version');
+    }
+
+    public static function mods() {
+        return self::getData('launcher/server/loadedServerMods');
+    }
+
+    public static function editions() {
+        $data = self::getData('launcher/server/connect');
+        $editions['editions'] = $data['editions'];
+        $editions['descriptions'] = $data['profileDescriptions'];
+        return $editions;
+    }
+
     public static function dynamic($path) {
         return self::getData($path);
+    }
+
+    // Client
+    public static function locale($locale) {
+        return self::getData('client/locale/' . $locale);
+    }
+
+    // Give-UI
+    public static function gvuiCheck() {
+        $data = self::getData('give-ui/server');
+    }
+
+    public static function gvuiProfiles() {
+        $profiles = self::getData('give-ui/profiles');
+    }
+
+    public static function gvuiGive($profile_id, $item_id, $amount) {
+        /*$body = [
+            'profileId' => $profile_id,
+            'itemId' => $item_id,
+            'amount' => $amount
+        ];
+        */
+        return self::getData('give-ui/give', $body);
     }
 }
