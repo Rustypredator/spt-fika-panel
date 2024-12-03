@@ -11,5 +11,6 @@ class SptController extends Controller
     {
         $path = request()->input('path');
         $response = SptApiHelper::dynamic($path);
+        return response()->json($response);
     }
 }
