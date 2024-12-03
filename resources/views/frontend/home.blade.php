@@ -1,26 +1,11 @@
-<!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+@extends('Layouts.Guest')
 
-        <title>{{config('app.name')}}</title>
+@section('content')
+<h1>Raids:</h1>
+<div id="raid_list"></div>
+@endsection
 
-        <!-- Fonts -->
-
-        <!-- Styles / Scripts -->
-        @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
-            @vite(['resources/css/app.css', 'resources/js/app.js'])
-        @else
-            <style>
-
-            </style>
-        @endif
-    </head>
-<body>
-    <h1>Raids:</h1>
-    <div id="raid_list"></div>
-</body>
+@push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         console.log("====== Application start ======");
@@ -48,4 +33,4 @@
         });
     }
 </script>
-</html>
+@endpush
