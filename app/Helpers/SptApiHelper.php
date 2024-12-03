@@ -2,10 +2,14 @@
 
 namespace App\Helpers;
 
+use App\Helpers\SptApi\Fika;
+use App\Helpers\SptApi\Client;
+use App\Helpers\SptApi\Launcher;
 use Illuminate\Support\Facades\Log;
 
 class SptApiHelper {
-    private static function getData($path, array $body = [], $session_id = null) {
+    // Utility
+    private static function getData($path, $method = 'GET', array $body = [], $session_id = null) {
         $host = config('spt.host');
         $port = config('spt.port');
         $headers = [
@@ -26,6 +30,7 @@ class SptApiHelper {
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
 
         if ($body) {
             curl_setopt($ch, CURLOPT_POST, 1);
@@ -57,54 +62,38 @@ class SptApiHelper {
         }
     }
 
-    public static function getRaids() {
-        return self::getData('fika/location/raids');
-    }
-
-    public static function ping() {
-        return self::getData('launcher/ping');
-    }
-
-    public static function version() {
-        return self::getData('launcher/version');
-    }
-
-    public static function mods() {
-        return self::getData('launcher/server/loadedServerMods');
-    }
-
-    public static function editions() {
-        $data = self::getData('launcher/server/connect');
-        $editions['editions'] = $data['editions'];
-        $editions['descriptions'] = $data['profileDescriptions'];
-        return $editions;
-    }
-
     public static function dynamic($path) {
         return self::getData($path);
     }
 
+    public static function dynamicSptApiModelRequest($model, $path, $body = [], $session = null) {
+        if ($model->session) {
+            return self::getData($model->url, $model->method, [], $session);
+        }
+        return self::getData($model->url, $model->method);
+    }
+
+    // Launcher
+    public static function launcher($path, $body = [], $session = null) {
+        $model = Launcher::getModel($path);
+        return self::dynamicSptApiModelRequest($model, $path, $body, $session);
+    }
+
     // Client
-    public static function locale($locale) {
-        return self::getData('client/locale/' . $locale);
+    public static function client($path, $body = [], $session = null) {
+        $model = Client::getModel($path);
+        return self::dynamicSptApiModelRequest($model, $path, $body, $session);
+    }
+
+    // Fika
+    public static function fika($path, $body = [], $session = null) {
+        $model = Fika::getModel($path);
+        return self::dynamicSptApiModelRequest($model, $path, $body, $session);
     }
 
     // Give-UI
-    public static function gvuiCheck() {
-        $data = self::getData('give-ui/server');
-    }
-
-    public static function gvuiProfiles() {
-        $profiles = self::getData('give-ui/profiles');
-    }
-
-    public static function gvuiGive($profile_id, $item_id, $amount) {
-        /*$body = [
-            'profileId' => $profile_id,
-            'itemId' => $item_id,
-            'amount' => $amount
-        ];
-        */
-        return self::getData('give-ui/give', $body);
+    public static function giveUi($path, $body = [], $session = null) {
+        $model = GiveUi::getModel($path);
+        return self::dynamicSptApiModelRequest($model, $path, $body, $session);
     }
 }
